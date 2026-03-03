@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { VisualizerMode } from "../algoritms/types";
 
 interface ControlsProps {
@@ -18,6 +19,7 @@ interface ControlsProps {
   onArraySizeChange: (size: number) => void;
   onRandomize: () => void;
   onVizModeChange: (mode: VisualizerMode) => void;
+  onCustomArray: (arr: number[]) => void;
 }
 
 const ALGORITHM_OPTIONS = [
@@ -46,7 +48,32 @@ export function Controls({
   onArraySizeChange,
   onRandomize,
   onVizModeChange,
+  onCustomArray,
 }: ControlsProps) {
+  const [customInput, setCustomInput] = useState("");
+  const [inputError, setInputError] = useState("");
+
+  function handleCustomApply() {
+    const parts = customInput
+      .split(/[,\s]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const nums = parts.map(Number);
+    if (parts.length === 0) {
+      setInputError("Please enter at least one number.");
+      return;
+    }
+    if (nums.some(isNaN) || nums.some((n) => n < 1 || n > 999)) {
+      setInputError("Only numbers between 1–999 allowed.");
+      return;
+    }
+    if (nums.length > 80) {
+      setInputError("Maximum 80 elements.");
+      return;
+    }
+    setInputError("");
+    onCustomArray(nums);
+  }
   return (
     <div className="flex flex-col gap-6 p-6 bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/50 w-full animate-in fade-in zoom-in-95 duration-500">
       {/* Algorithm Selection */}
@@ -69,6 +96,43 @@ export function Controls({
               <span>{opt.label}</span>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Custom Array Input */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Custom Array
+        </label>
+        <div className="flex gap-2 items-start">
+          <div className="flex-1 flex flex-col gap-1">
+            <input
+              type="text"
+              value={customInput}
+              onChange={(e) => {
+                setCustomInput(e.target.value);
+                setInputError("");
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handleCustomApply()}
+              placeholder="e.g.  5, 3, 8, 1, 9, 2"
+              className={`w-full px-4 py-2.5 rounded-xl font-mono text-sm bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 border-2 outline-none transition-colors placeholder:text-slate-400 ${
+                inputError
+                  ? "border-rose-400 focus:border-rose-500"
+                  : "border-transparent focus:border-indigo-400"
+              }`}
+            />
+            {inputError && (
+              <p className="text-xs text-rose-500 font-medium px-1">
+                {inputError}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={handleCustomApply}
+            className="px-5 py-2.5 rounded-xl font-semibold bg-indigo-500 text-white hover:bg-indigo-400 active:scale-95 transition-all shadow-md shadow-indigo-500/30 whitespace-nowrap"
+          >
+            Apply
+          </button>
         </div>
       </div>
 

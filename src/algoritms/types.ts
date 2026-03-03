@@ -14,6 +14,8 @@ export interface SortStep {
   bars: ArrayBar[];
   description: string;
   dryRun?: DryRunState;
+  comparisons: number;
+  swaps: number;
 }
 
 export type SortingAlgorithm = (arr: number[]) => SortStep[];

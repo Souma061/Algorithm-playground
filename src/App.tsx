@@ -73,6 +73,14 @@ export default function App() {
     [generate],
   );
 
+  const handleCustomArray = useCallback(
+    (arr: number[]) => {
+      setArraySize(arr.length);
+      generate(arr);
+    },
+    [generate],
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-4">
@@ -84,7 +92,7 @@ export default function App() {
             Algorithm Playground
           </h1>
           <p className="text-lg text-slate-500 dark:text-slate-400 font-medium z-10">
-            Interactive  Algorithm Visualizer
+            Interactive Algorithm Visualizer
           </p>
         </header>
 
@@ -145,7 +153,101 @@ export default function App() {
             onArraySizeChange={handleArraySizeChange}
             onRandomize={handleRandomize}
             onVizModeChange={setVizMode}
+            onCustomArray={handleCustomArray}
           />
+
+          {/* Live Stats */}
+          {currentFrame && (
+            <div className="flex items-center justify-center gap-4 sm:gap-8">
+              <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-500/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-amber-600 dark:text-amber-400"
+                  >
+                    <path d="m9 9 5 12 1.774-5.226L21 14 9 9z" />
+                    <path d="m16.071 16.071 4.243 4.243" />
+                    <path d="m7.188 2.239.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656-2.12 2.122" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Comparisons
+                  </div>
+                  <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono tabular-nums leading-tight">
+                    {currentFrame.comparisons.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-100 dark:bg-rose-500/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-rose-600 dark:text-rose-400"
+                  >
+                    <path d="M7 16V4m0 0L3 8m4-4 4 4" />
+                    <path d="M17 8v12m0 0 4-4m-4 4-4-4" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Swaps
+                  </div>
+                  <div className="text-2xl font-bold text-rose-600 dark:text-rose-400 font-mono tabular-nums leading-tight">
+                    {currentFrame.swaps.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-500/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-indigo-600 dark:text-indigo-400"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M3 9h18M9 21V9" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Step
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums leading-tight">
+                    {currentStep + 1}{" "}
+                    <span className="text-sm font-normal text-slate-400">
+                      / {totalSteps}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Visualizer Area */}
           <div className="w-full bg-white dark:bg-slate-800 rounded-3xl p-4 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/50 min-h-[380px] flex flex-col overflow-hidden relative">
@@ -214,9 +316,6 @@ export default function App() {
             </div>
           )}
         </main>
-
-
-
       </div>
     </div>
   );
