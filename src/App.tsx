@@ -84,7 +84,7 @@ export default function App() {
             Algorithm Playground
           </h1>
           <p className="text-lg text-slate-500 dark:text-slate-400 font-medium z-10">
-            Interactive Sorting Algorithm Visualizer
+            Interactive  Algorithm Visualizer
           </p>
         </header>
 
