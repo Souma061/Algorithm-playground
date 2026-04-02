@@ -31,3 +31,56 @@ export interface AlgorithmCode {
 }
 
 export type VisualizerMode = 'bars' | 'boxes';
+
+export type TreeNodeState = 'default' | 'visiting' | 'visited' | 'found';
+
+export interface TreeNode {
+  value: number;
+  state: TreeNodeState;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+
+export interface TreeNodeBar {
+  value: number;
+  state: TreeNodeState;
+  x: number;
+  y: number;
+  parentX?: number;
+  parentY?: number;
+}
+
+export interface TreeStep {
+  nodes: TreeNodeBar[];
+  description: string;
+  dryRun?: DryRunState;
+  comparisons: number;
+  swaps: number;
+  traversalOrder?: number[];
+}
+
+export type TreeAlgorithm = (values: number[]) => TreeStep[];
+
+export type AlgorithmCategory = 'sorting' | 'searching' | 'tree' | 'linkedlist';
+
+export type ListNodeState = 'default' | 'visiting' | 'visited' | 'found' | 'inserting' | 'deleting' | 'swapping';
+
+export interface ListNodeBar {
+  value: number;
+  state: ListNodeState;
+  index: number;
+  hasArrow: boolean;
+  isHead?: boolean;
+  isTail?: boolean;
+}
+
+export interface LinkedListStep {
+  nodes: ListNodeBar[];
+  description: string;
+  dryRun?: DryRunState;
+  comparisons: number;
+  swaps: number;
+  resultOrder?: number[];
+}
+
+export type LinkedListAlgorithm = (values: number[]) => LinkedListStep[];

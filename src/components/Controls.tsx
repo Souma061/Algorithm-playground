@@ -23,11 +23,27 @@ interface ControlsProps {
 }
 
 const ALGORITHM_OPTIONS = [
-  { value: "bubble", label: "Bubble Sort", icon: "🫧" },
-  { value: "selection", label: "Selection Sort", icon: "👆" },
-  { value: "insertion", label: "Insertion Sort", icon: "📥" },
-  { value: "merge", label: "Merge Sort", icon: "🔀" },
-  { value: "quick", label: "Quick Sort", icon: "⚡" },
+  // Sorting
+  { value: "bubble", label: "Bubble Sort", icon: "🫧", category: "Sorting" },
+  { value: "selection", label: "Selection Sort", icon: "👆", category: "Sorting" },
+  { value: "insertion", label: "Insertion Sort", icon: "📥", category: "Sorting" },
+  { value: "merge", label: "Merge Sort", icon: "🔀", category: "Sorting" },
+  { value: "quick", label: "Quick Sort", icon: "⚡", category: "Sorting" },
+  // Searching
+  { value: "linearSearch", label: "Linear Search", icon: "🔍", category: "Searching" },
+  { value: "binarySearch", label: "Binary Search", icon: "🎯", category: "Searching" },
+  // Tree
+  { value: "bstInsert", label: "BST + Inorder", icon: "🌳", category: "Tree" },
+  { value: "bstSearch", label: "BST Search", icon: "🌲", category: "Tree" },
+  { value: "bstPreorder", label: "BST Preorder", icon: "🔄", category: "Tree" },
+  { value: "bstPostorder", label: "BST Postorder", icon: "🔚", category: "Tree" },
+  // Linked List
+  { value: "llTraversal", label: "LL Traversal", icon: "🚶", category: "Linked List" },
+  { value: "llInsertHead", label: "LL Insert Head", icon: "⬅️", category: "Linked List" },
+  { value: "llInsertTail", label: "LL Insert Tail", icon: "➡️", category: "Linked List" },
+  { value: "llDelete", label: "LL Delete", icon: "🗑️", category: "Linked List" },
+  { value: "llReverse", label: "LL Reverse", icon: "↩️", category: "Linked List" },
+  { value: "llFindMiddle", label: "LL Find Middle", icon: "🎯", category: "Linked List" },
 ];
 
 export function Controls({
@@ -81,21 +97,34 @@ export function Controls({
         <label className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
           Algorithm
         </label>
-        <div className="flex flex-wrap gap-2">
-          {ALGORITHM_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
-                algorithm === opt.value
-                  ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 scale-105"
-                  : "bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105"
-              }`}
-              onClick={() => onAlgorithmChange(opt.value)}
-            >
-              <span className="text-xl">{opt.icon}</span>
-              <span>{opt.label}</span>
-            </button>
-          ))}
+        <div className="flex flex-col gap-3">
+          {["Sorting", "Searching", "Tree", "Linked List"].map((cat) => {
+            const catOpts = ALGORITHM_OPTIONS.filter((o) => o.category === cat);
+            return (
+              <div key={cat} className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  {cat === "Tree" ? "🌳 " : cat === "Searching" ? "🔍 " : cat === "Linked List" ? "🔗 " : "📊 "}
+                  {cat}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {catOpts.map((opt) => (
+                    <button
+                      key={opt.value}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                        algorithm === opt.value
+                          ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 scale-105"
+                          : "bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105"
+                      }`}
+                      onClick={() => onAlgorithmChange(opt.value)}
+                    >
+                      <span className="text-xl">{opt.icon}</span>
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

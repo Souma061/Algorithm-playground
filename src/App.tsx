@@ -5,22 +5,66 @@ import { insertionSort } from "./algoritms/insertionSort";
 import { mergeSort } from "./algoritms/mergeSort";
 import { quickSort } from "./algoritms/quickSort";
 import { selectionSort } from "./algoritms/selectionSort";
-import type { SortingAlgorithm, VisualizerMode } from "./algoritms/types";
+import { linearSearch } from "./algoritms/linearSearch";
+import { binarySearch } from "./algoritms/binarySearch";
+import { bstInsertAndTraverse, bstSearch, bstPreorder, bstPostorder } from "./algoritms/bst";
+import {
+  linkedListTraversal,
+  linkedListInsertHead,
+  linkedListInsertTail,
+  linkedListDelete,
+  linkedListReverse,
+  linkedListFindMiddle,
+} from "./algoritms/linkedList";
+import type {
+  LinkedListAlgorithm,
+  LinkedListStep,
+  SortStep,
+  SortingAlgorithm,
+  TreeAlgorithm,
+  TreeStep,
+  VisualizerMode,
+} from "./algoritms/types";
 import { ArrayBoxes } from "./components/ArrayBoxes";
 import { BarChart } from "./components/BarChart";
 import { CodePanel } from "./components/CodePanel";
 import { Controls } from "./components/Controls";
 import { DryRunPanel } from "./components/DryRunPanel";
+import { LinkedListView } from "./components/LinkedListView";
 import { RaceView } from "./components/RaceView";
 import { StepDescription } from "./components/StepDescription";
+import { TreeView } from "./components/TreeView";
+import { useLinkedList } from "./hooks/useLinkedList";
 import { useSorting } from "./hooks/useSorting";
+import { useTree } from "./hooks/useTree";
 
-const ALGORITHMS: Record<string, SortingAlgorithm> = {
+const SORT_ALGORITHMS: Record<string, SortingAlgorithm> = {
   bubble: bubbleSort,
   selection: selectionSort,
   insertion: insertionSort,
   merge: mergeSort,
   quick: quickSort,
+};
+
+const SEARCH_ALGORITHMS: Record<string, SortingAlgorithm> = {
+  linearSearch: linearSearch,
+  binarySearch: binarySearch,
+};
+
+const TREE_ALGORITHMS: Record<string, TreeAlgorithm> = {
+  bstInsert: bstInsertAndTraverse,
+  bstSearch: bstSearch,
+  bstPreorder: bstPreorder,
+  bstPostorder: bstPostorder,
+};
+
+const LINKED_LIST_ALGORITHMS: Record<string, LinkedListAlgorithm> = {
+  llTraversal: linkedListTraversal,
+  llInsertHead: linkedListInsertHead,
+  llInsertTail: linkedListInsertTail,
+  llDelete: linkedListDelete,
+  llReverse: linkedListReverse,
+  llFindMiddle: linkedListFindMiddle,
 };
 
 type AppTab = "visualizer" | "race";
@@ -38,24 +82,69 @@ export default function App() {
   const [arraySize, setArraySize] = useState(20);
   const [vizMode, setVizMode] = useState<VisualizerMode>("bars");
 
-  const sortFn = ALGORITHMS[algorithm]!;
+  const isTreeAlgo = algorithm in TREE_ALGORITHMS;
+  const isLLAlgo = algorithm in LINKED_LIST_ALGORITHMS;
   const info = algorithmInfo[algorithm]!;
   const code = algorithmCodes[algorithm]!;
 
   const {
-    currentFrame,
-    currentStep,
-    totalSteps,
-    isPlaying,
-    speed,
-    setSpeed,
-    generate,
-    play,
-    pause,
-    stepForward,
-    stepBackward,
-    reset,
-  } = useSorting(sortFn);
+    currentFrame: sortFrame,
+    currentStep: sortStep,
+    totalSteps: sortTotal,
+    isPlaying: sortPlaying,
+    speed: sortSpeed,
+    setSpeed: setSortSpeed,
+    generate: sortGenerate,
+    play: sortPlay,
+    pause: sortPause,
+    stepForward: sortStepForward,
+    stepBackward: sortStepBackward,
+    reset: sortReset,
+  } = useSorting(SORT_ALGORITHMS[algorithm] ?? SEARCH_ALGORITHMS[algorithm] ?? bubbleSort);
+
+  const {
+    currentFrame: treeFrame,
+    currentStep: treeStep,
+    totalSteps: treeTotal,
+    isPlaying: treePlaying,
+    speed: treeSpeed,
+    setSpeed: setTreeSpeed,
+    generate: treeGenerate,
+    play: treePlay,
+    pause: treePause,
+    stepForward: treeStepForward,
+    stepBackward: treeStepBackward,
+    reset: treeReset,
+  } = useTree(TREE_ALGORITHMS[algorithm] ?? bstInsertAndTraverse);
+
+  const {
+    currentFrame: llFrame,
+    currentStep: llStep,
+    totalSteps: llTotal,
+    isPlaying: llPlaying,
+    speed: llSpeed,
+    setSpeed: setLLSpeed,
+    generate: llGenerate,
+    play: llPlay,
+    pause: llPause,
+    stepForward: llStepForward,
+    stepBackward: llStepBackward,
+    reset: llReset,
+  } = useLinkedList(LINKED_LIST_ALGORITHMS[algorithm] ?? linkedListTraversal);
+
+  const currentFrame = isTreeAlgo ? treeFrame : isLLAlgo ? llFrame : sortFrame;
+  const currentStep = isTreeAlgo ? treeStep : isLLAlgo ? llStep : sortStep;
+  const totalSteps = isTreeAlgo ? treeTotal : isLLAlgo ? llTotal : sortTotal;
+  const isPlaying = isTreeAlgo ? treePlaying : isLLAlgo ? llPlaying : sortPlaying;
+  const speed = isTreeAlgo ? treeSpeed : isLLAlgo ? llSpeed : sortSpeed;
+
+  const generate = isTreeAlgo ? treeGenerate : isLLAlgo ? llGenerate : sortGenerate;
+  const play = isTreeAlgo ? treePlay : isLLAlgo ? llPlay : sortPlay;
+  const pause = isTreeAlgo ? treePause : isLLAlgo ? llPause : sortPause;
+  const stepForward = isTreeAlgo ? treeStepForward : isLLAlgo ? llStepForward : sortStepForward;
+  const stepBackward = isTreeAlgo ? treeStepBackward : isLLAlgo ? llStepBackward : sortStepBackward;
+  const reset = isTreeAlgo ? treeReset : isLLAlgo ? llReset : sortReset;
+  const setSpeed = isTreeAlgo ? setTreeSpeed : isLLAlgo ? setLLSpeed : setSortSpeed;
 
   const handleRandomize = useCallback(() => {
     generate(randomArray(arraySize));
@@ -64,9 +153,15 @@ export default function App() {
   const handleAlgorithmChange = useCallback(
     (algo: string) => {
       setAlgorithm(algo);
-      generate(randomArray(arraySize));
+      if (algo in TREE_ALGORITHMS) {
+        treeGenerate(randomArray(arraySize));
+      } else if (algo in LINKED_LIST_ALGORITHMS) {
+        llGenerate(randomArray(arraySize));
+      } else {
+        sortGenerate(randomArray(arraySize));
+      }
     },
-    [arraySize, generate],
+    [arraySize, sortGenerate, treeGenerate, llGenerate],
   );
 
   const handleArraySizeChange = useCallback(
@@ -159,10 +254,16 @@ export default function App() {
               </div>
               <div className="flex flex-col items-center justify-center p-2">
                 <span className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-1">
-                  Stable
+                  {isTreeAlgo ? "Category" : isLLAlgo ? "Category" : "Stable"}
                 </span>
                 <span className="text-base font-medium">
-                  {info.stable ? "✅ Yes" : "❌ No"}
+                  {isTreeAlgo
+                    ? "🌳 Tree"
+                    : isLLAlgo
+                      ? "🔗 Linked List"
+                      : info.stable
+                        ? "✅ Yes"
+                        : "❌ No"}
                 </span>
               </div>
             </div>
@@ -241,7 +342,7 @@ export default function App() {
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Swaps
+                      {isTreeAlgo || isLLAlgo ? "Accesses" : "Swaps"}
                     </div>
                     <div className="text-2xl font-bold text-rose-600 dark:text-rose-400 font-mono tabular-nums leading-tight">
                       {currentFrame.swaps.toLocaleString()}
@@ -286,10 +387,17 @@ export default function App() {
             <div className="w-full bg-white dark:bg-slate-800 rounded-3xl p-4 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/50 min-h-[380px] flex flex-col overflow-hidden relative">
               {currentFrame ? (
                 <div className="flex-1 flex flex-col justify-end relative h-full w-full">
-                  {vizMode === "bars" ? (
-                    <BarChart bars={currentFrame.bars} />
+                  {isTreeAlgo ? (
+                    <TreeView
+                      nodes={(currentFrame as TreeStep).nodes}
+                      traversalOrder={(currentFrame as TreeStep).traversalOrder}
+                    />
+                  ) : isLLAlgo ? (
+                    <LinkedListView nodes={(currentFrame as LinkedListStep).nodes} />
+                  ) : vizMode === "bars" ? (
+                    <BarChart bars={(currentFrame as SortStep).bars} />
                   ) : (
-                    <ArrayBoxes bars={currentFrame.bars} />
+                    <ArrayBoxes bars={(currentFrame as SortStep).bars} />
                   )}
                   <div className="mt-4 border-t border-slate-100 dark:border-slate-700 pt-4">
                     <StepDescription
@@ -301,14 +409,20 @@ export default function App() {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center opacity-80 h-full">
-                  <div className="text-6xl mb-4 animate-pulse">🎲</div>
+                  <div className="text-6xl mb-4 animate-pulse">
+                    {isTreeAlgo ? "🌳" : isLLAlgo ? "🔗" : "🎲"}
+                  </div>
                   <h2 className="text-2xl font-bold mb-2">
                     Ready to Visualize
                   </h2>
                   <p className="text-slate-500 dark:text-slate-400">
                     Select an algorithm and press{" "}
                     <strong className="text-indigo-500">Randomize</strong> to
-                    generate an array
+                    {isTreeAlgo
+                      ? " build a tree"
+                      : isLLAlgo
+                        ? " create a linked list"
+                        : " generate an array"}
                   </p>
                 </div>
               )}
@@ -316,22 +430,68 @@ export default function App() {
 
             {/* Legend */}
             <div className="flex flex-wrap items-center justify-center gap-6 py-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
-                <span className="text-sm font-medium">Default</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                <span className="text-sm font-medium">Comparing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-                <span className="text-sm font-medium">Swapping</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                <span className="text-sm font-medium">Sorted</span>
-              </div>
+              {isTreeAlgo ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+                    <span className="text-sm font-medium">Default</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                    <span className="text-sm font-medium">Visiting</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                    <span className="text-sm font-medium">Visited</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                    <span className="text-sm font-medium">Found</span>
+                  </div>
+                </>
+              ) : isLLAlgo ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+                    <span className="text-sm font-medium">Default</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                    <span className="text-sm font-medium">Visiting</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                    <span className="text-sm font-medium">Visited</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
+                    <span className="text-sm font-medium">Inserting</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                    <span className="text-sm font-medium">Deleting</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+                    <span className="text-sm font-medium">Default</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                    <span className="text-sm font-medium">Comparing</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                    <span className="text-sm font-medium">Swapping</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                    <span className="text-sm font-medium">Sorted</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Code + Dry Run Panels */}
