@@ -8,8 +8,8 @@ export function useTree(algorithm: TreeAlgorithm) {
   const [speed, setSpeed] = useState(500);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const generate = useCallback((values: number[]) => {
-    const s = algorithm(values);
+  const generate = useCallback((values: number[], algorithmOverride?: TreeAlgorithm) => {
+    const s = (algorithmOverride ?? algorithm)(values);
     setSteps(s);
     setCurrentStep(0);
     setIsPlaying(false);
@@ -21,6 +21,7 @@ export function useTree(algorithm: TreeAlgorithm) {
 
   const play = useCallback(() => {
     if (steps.length === 0) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setIsPlaying(true);
     intervalRef.current = setInterval(() => {
       setCurrentStep(prev => {

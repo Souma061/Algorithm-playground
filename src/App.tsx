@@ -154,11 +154,11 @@ export default function App() {
     (algo: string) => {
       setAlgorithm(algo);
       if (algo in TREE_ALGORITHMS) {
-        treeGenerate(randomArray(arraySize));
+        treeGenerate(randomArray(arraySize), TREE_ALGORITHMS[algo]);
       } else if (algo in LINKED_LIST_ALGORITHMS) {
-        llGenerate(randomArray(arraySize));
+        llGenerate(randomArray(arraySize), LINKED_LIST_ALGORITHMS[algo]);
       } else {
-        sortGenerate(randomArray(arraySize));
+        sortGenerate(randomArray(arraySize), SORT_ALGORITHMS[algo] ?? SEARCH_ALGORITHMS[algo]);
       }
     },
     [arraySize, sortGenerate, treeGenerate, llGenerate],
@@ -464,12 +464,20 @@ export default function App() {
                     <span className="text-sm font-medium">Visited</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                    <span className="text-sm font-medium">Found</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
                     <span className="text-sm font-medium">Inserting</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
                     <span className="text-sm font-medium">Deleting</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
+                    <span className="text-sm font-medium">Swapping</span>
                   </div>
                 </>
               ) : (

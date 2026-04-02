@@ -227,6 +227,15 @@ export function linkedListDelete(values: number[]): LinkedListStep[] {
 
   const idx = list.indexOf(target);
   if (idx !== -1) {
+    nodes = makeNodes(list);
+    nodes[idx]!.state = "deleting";
+    steps.push(
+      snapshot(nodes, `Removing node at index ${idx} with value ${target}`, comparisons, accesses, 4, {
+        i: idx,
+        target,
+      })
+    );
+
     list.splice(idx, 1);
     nodes = makeNodes(list);
     steps.push(
@@ -315,7 +324,7 @@ export function linkedListFindMiddle(values: number[]): LinkedListStep[] {
   let slow = 0;
   let fast = 0;
 
-  while (fast < nodes.length - 1 && fast + 1 < nodes.length - 1) {
+  while (fast + 2 <= nodes.length) {
     resetAll(nodes);
 
     if (slow < nodes.length) nodes[slow]!.state = "visiting";

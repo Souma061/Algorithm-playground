@@ -8,8 +8,8 @@ export function useSorting(algorithm: SortingAlgorithm) {
   const [speed, setSpeed] = useState(300);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const generate = useCallback((arr: number[]) => {
-    const s = algorithm(arr);
+  const generate = useCallback((arr: number[], algorithmOverride?: SortingAlgorithm) => {
+    const s = (algorithmOverride ?? algorithm)(arr);
     setSteps(s);
     setCurrentStep(0);
     setIsPlaying(false);
@@ -21,6 +21,7 @@ export function useSorting(algorithm: SortingAlgorithm) {
 
   const play = useCallback(() => {
     if (steps.length === 0) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setIsPlaying(true);
     intervalRef.current = setInterval(() => {
       setCurrentStep(prev => {

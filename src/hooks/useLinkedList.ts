@@ -9,8 +9,8 @@ export function useLinkedList(algorithm: LinkedListAlgorithm) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const generate = useCallback(
-    (values: number[]) => {
-      const s = algorithm(values);
+    (values: number[], algorithmOverride?: LinkedListAlgorithm) => {
+      const s = (algorithmOverride ?? algorithm)(values);
       setSteps(s);
       setCurrentStep(0);
       setIsPlaying(false);
@@ -24,6 +24,7 @@ export function useLinkedList(algorithm: LinkedListAlgorithm) {
 
   const play = useCallback(() => {
     if (steps.length === 0) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setIsPlaying(true);
     intervalRef.current = setInterval(() => {
       setCurrentStep((prev) => {
